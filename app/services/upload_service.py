@@ -1,10 +1,9 @@
 import shutil
 import uuid
 from pathlib import Path
-
+from app.tasks.image_tasks import process_image
 from fastapi import UploadFile
 from sqlalchemy.orm import Session
-
 from app.core.config import settings
 from app.models.job import Job
 
@@ -42,5 +41,7 @@ def save_uploaded_file(
     db.add(job)
     db.commit()
     db.refresh(job)
+
+    process_image.delay(job.id)
 
     return job
